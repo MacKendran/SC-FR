@@ -57,10 +57,7 @@
                 Margin="0,0,20,0"
                 />
 
-        <Controls:GameTypeControl x:Name="liveControl" text="Live" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Grid.RowSpan="2" Margin="10,0,0,0"/>
-        <Controls:GameTypeControl x:Name="PTUControl" text="PTU" HorizontalAlignment="Left" Margin="60,0,0,0" Grid.Row="2" VerticalAlignment="Top" Grid.RowSpan="2"/>
-        <Controls:GameTypeControl x:Name="EPTUControl" text="EPTU" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Center" Grid.RowSpan="2" Margin="110,0,0,0"/>
-
+        <WrapPanel x:Name="GameControlPanel"  Orientation="Horizontal" Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2"></WrapPanel>
     </Grid>
 
 </Window>

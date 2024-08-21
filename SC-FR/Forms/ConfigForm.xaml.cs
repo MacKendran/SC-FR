@@ -1,6 +1,8 @@
 ﻿using SCFR.Controls;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Forms;
 using static SCFR.Enumerator;
 
 namespace SCFR
@@ -27,13 +29,14 @@ namespace SCFR
                 (scLauncherFileSelect, SCPathType.Launcher),
                 (scGamePathSelect, SCPathType.Games)
             };
+            /*
             controlCheck = new List<(GameTypeControl control, GameType type)>()
             {
                 (this.liveControl,GameType.Live),
                 (this.PTUControl,GameType.PTU),
                 (this.EPTUControl,GameType.EPTU)
             };
-
+            */
             //fileSelectorList.Add((scLiveFileSelect, Enum.PathType.Games));
 
             scGamePathSelect.PathChanged += ScGamePathSelect_PathChanged;
@@ -48,27 +51,40 @@ namespace SCFR
         {
             var s = sender as SelectFile;
 
-
-
-            foreach (var c in controlCheck)
+            foreach (GameType g in Enum.GetValues(typeof(GameType)))
             {
-                if (PathTools.GameTypeExists(s.file, c.type))
+                GameTypeControl control = null;
+                string controlName = g.ToString() + "Control";
+                foreach (GameTypeControl c in GameControlPanel.Children)
                 {
-                    c.control.checkboxEnabled = true;
-                    string val = app.GetParam(c.type);
-                    if (string.IsNullOrEmpty(val) || val == "1") 
-                        c.control.SetCheck(true,false);
-                    else
-                        c.control.SetCheck(false, false);
+                    if (c.Name.Equals(controlName))
+                    {
+                        control = c;
+                        break;
+                    }
                 }
-                else
+
+                if (PathTools.GameTypeExists(s.file, g))
                 {
-                    c.control.SetCheck(false, false);
-                    c.control.checkboxEnabled = false;
-                    
+                    string val = app.GetParam(g);
+                    if (control == null)
+                    {
+                        control = new GameTypeControl();
+                        control.Name = controlName;
+                        control.text = g.ToString();
+                        GameControlPanel.Children.Add(control);
+                    }
+                    control.checkboxEnabled = true;
+                    if (string.IsNullOrEmpty(val) || val == "1")
+                        control.SetCheck(true, false);
+                    else
+                        control.SetCheck(false, false);
+                }
+                else if (control != null)
+                { 
+                    control.checkboxEnabled = false;
                 }
                 
-
             }
         }
 
@@ -78,10 +94,10 @@ namespace SCFR
             {
                 app.ini.Write(f.type.ToString(), f.control.file, IniSection.Path);
             }
-            foreach (var f in controlCheck)
+            foreach (GameTypeControl f in GameControlPanel.Children)
             {
-                if (f.control.checkboxEnabled)
-                    app.ini.Write(f.type.ToString(), f.control.isChecked?"1":"0", IniSection.Options);
+                if (f.checkboxEnabled )
+                    app.ini.Write(f.text, f.isChecked?"1":"0", IniSection.Options);
             }
 
         }
