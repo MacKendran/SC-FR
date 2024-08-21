@@ -101,6 +101,11 @@ namespace SCFR
             if(!param.TryAdd(key, value))
                 param[key] = value;
         }
+        internal void SetParam(GameType key, string val)
+        { SetParam(key.ToString(), val); }
+        internal void SetParam(SCPathType key, string val)
+        { SetParam(key.ToString(), val); }
+
         internal void UpdateTrad(bool silentSuccess)
         {
             var progressForm = new ProgressForm("Mise à jour de la traduction",silentSuccess);

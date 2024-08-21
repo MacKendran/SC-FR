@@ -38,7 +38,7 @@ namespace SCFR
             };
             */
             //fileSelectorList.Add((scLiveFileSelect, Enum.PathType.Games));
-
+            scLauncherFileSelect.PathChanged += ScLauncherFileSelect_PathChanged;
             scGamePathSelect.PathChanged += ScGamePathSelect_PathChanged;
 
             foreach (var f in fileSelectorList)
@@ -47,9 +47,15 @@ namespace SCFR
             }
         }
 
+        private void ScLauncherFileSelect_PathChanged(object? sender, EventArgs e)
+        {
+            app.SetParam(SCPathType.Launcher,scLauncherFileSelect.textbox.Text);
+        }
+
         private void ScGamePathSelect_PathChanged(object? sender, EventArgs e)
         {
             var s = sender as SelectFile;
+            app.SetParam(SCPathType.Games, scGamePathSelect.textbox.Text);
 
             foreach (GameType g in Enum.GetValues(typeof(GameType)))
             {
