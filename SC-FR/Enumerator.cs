@@ -32,6 +32,10 @@ namespace SCFR
             TradNotValid,
             ErrorFile
         }
+        public enum IniOption
+        { 
+            AutoMaj
+        }
 
         public enum IniSection
         { 

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Interop;
 using static SCFR.Enumerator;
 
 namespace SCFR
@@ -15,35 +16,79 @@ namespace SCFR
         App app = (App)System.Windows.Application.Current;
 
         List<(SelectFile control, SCPathType type)> fileSelectorList;
-
-
         List<(GameTypeControl control, GameType type)> controlCheck;
 
+        public bool autoClose = false;
+        public uint autoCloseTiming;
+
+        System.Timers.Timer timer;
 
         public ConfigForm()
         {
+            this.Loaded += ConfigForm_Loaded;
+            this.Activated += ConfigForm_Activated;
             InitializeComponent();
-
             fileSelectorList = new List<(SelectFile control, SCPathType type)>()
             {
                 (scLauncherFileSelect, SCPathType.Launcher),
                 (scGamePathSelect, SCPathType.Games)
             };
-            /*
-            controlCheck = new List<(GameTypeControl control, GameType type)>()
-            {
-                (this.liveControl,GameType.Live),
-                (this.PTUControl,GameType.PTU),
-                (this.EPTUControl,GameType.EPTU)
-            };
-            */
-            //fileSelectorList.Add((scLiveFileSelect, Enum.PathType.Games));
+
             scLauncherFileSelect.PathChanged += ScLauncherFileSelect_PathChanged;
             scGamePathSelect.PathChanged += ScGamePathSelect_PathChanged;
 
             foreach (var f in fileSelectorList)
             {
                 f.control.file = app.GetParam(f.type);
+            }
+
+            CheckboxAutoLaunch.IsChecked = app.GetParam(IniOption.AutoMaj) == "1";
+            
+
+        }
+
+        private void ConfigForm_Activated(object? sender, EventArgs e)
+        {
+            if (autoClose && timer != null)
+            { 
+                autoClose = false;
+                timer.Stop();
+                this.labelAutoClose.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void ConfigForm_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (autoClose)
+            {
+                labelAutoClose.Content = string.Empty;
+                labelAutoClose.Visibility = Visibility.Visible;
+                
+                timer = new System.Timers.Timer(1000);
+                timer.Elapsed += AutoCloseTimer_Elapsed;
+                timer.Start();
+            }
+        }
+
+        private void AutoCloseTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (!autoClose)
+            {
+                labelAutoClose.Visibility = Visibility.Hidden;
+                this.timer.Stop();
+            }
+            autoCloseTiming--;
+            Dispatcher.Invoke(() =>
+            {
+                labelAutoClose.Content = $"{autoCloseTiming} secondes avant fermeture automatique";
+            });
+
+            if (autoCloseTiming == 0)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    this.Close();
+                });
             }
         }
 
@@ -90,12 +135,14 @@ namespace SCFR
                 { 
                     control.checkboxEnabled = false;
                 }
-                
             }
         }
 
         private void SaveIni()
         {
+            if (!app.saveIni)
+                return;
+
             foreach (var f in fileSelectorList)
             {
                 app.ini.Write(f.type.ToString(), f.control.file, IniSection.Path);
@@ -105,16 +152,18 @@ namespace SCFR
                 if (f.checkboxEnabled )
                     app.ini.Write(f.text, f.isChecked?"1":"0", IniSection.Options);
             }
-
+            foreach (IniOption f in Enum.GetValues(typeof(IniOption)))
+            {
+                app.ini.Write(f.ToString(), app.GetParam(f), IniSection.Options);
+            }
         }
 
         private void bExeSC_Click(object sender, RoutedEventArgs e)
         {
             SaveIni();
-
-            string launcherPath = app.GetParam(SCPathType.Launcher);
-            Process.Start(launcherPath);
-
+            
+            app.LaunchStarCitizen();
+            
             this.Close();
         }
 
@@ -127,6 +176,13 @@ namespace SCFR
             p.UpdateTrad(false);
             
             return;
+        }
+
+        private void CheckboxAutoLaunch_Click(object sender, RoutedEventArgs e)
+        {
+            var s = sender as System.Windows.Controls.CheckBox;
+            app.SetParam(IniOption.AutoMaj, s.IsChecked == true ? "1" : "0");
+            SaveIni();
         }
     }
 }

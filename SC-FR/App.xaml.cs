@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Eventing.Reader;
+﻿using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -26,6 +27,7 @@ namespace SCFR
 
         internal Dictionary<string, string> param = new Dictionary<string, string>();
         internal bool saveIni = true;
+
         public App() : base()
         {
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
@@ -46,6 +48,7 @@ namespace SCFR
                     --env / -e < Live | PTU | EPTU | TECHPREVIEW | HOTFIX | all >
                     */
                 }
+                saveIni = false;
             }
             else
             {
@@ -56,9 +59,18 @@ namespace SCFR
                 LoadIni();
             }
 
-            var configForm = new ConfigForm();
+            ConfigForm configForm = new ConfigForm();
+            if (GetParam(IniOption.AutoMaj) == "1")
+            {
+                var progress = new ProgressForm("MAJ Automatique de la traduction",true);
+                progress.ShowDialog();
+                this.LaunchStarCitizen();
+                configForm.autoClose = true;
+                configForm.autoCloseTiming = 30;
+            }
+            
             configForm.ShowDialog();
-
+            
             this.Shutdown();
 
         }
@@ -83,6 +95,11 @@ namespace SCFR
                     SetParam(key,"1");
             }
 
+            foreach (IniOption o in Enum.GetValues(typeof(IniOption)))
+            {
+                SetParam(o, ini.Read(o.ToString(), IniSection.Options));
+            }
+
         }
         internal string GetParam(string key)
         {
@@ -95,6 +112,8 @@ namespace SCFR
         { return GetParam(type.ToString()); }
         internal string GetParam(GameType type)
         { return GetParam(type.ToString()); }
+        internal string GetParam(IniOption type)
+        { return GetParam(type.ToString()); }
 
         internal void SetParam(string key, string value)
         {
@@ -105,6 +124,14 @@ namespace SCFR
         { SetParam(key.ToString(), val); }
         internal void SetParam(SCPathType key, string val)
         { SetParam(key.ToString(), val); }
+        internal void SetParam(IniOption key, string val)
+        { SetParam(key.ToString(), val); }
+
+        internal void LaunchStarCitizen()
+        {
+            string launcherPath = this.GetParam(SCPathType.Launcher);
+            Process.Start(launcherPath);
+        }
 
         internal void UpdateTrad(bool silentSuccess)
         {
