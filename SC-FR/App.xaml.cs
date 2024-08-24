@@ -2,6 +2,7 @@
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using static SCFR.Enumerator;
@@ -26,7 +27,6 @@ namespace SCFR
         internal byte[] tradFileBytes = new byte[0];
 
         internal Dictionary<string, string> param = new Dictionary<string, string>();
-        internal bool saveIni = true;
 
         public App() : base()
         {
@@ -37,26 +37,17 @@ namespace SCFR
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            
+
+            if (!File.Exists(iniFile))
+            {
+                PathTools.DetectPaths(this.ini);
+            }
+            LoadIni();
+
+
             if (e.Args.Length > 0)
             {
-                foreach (string arg in e.Args)
-                {
-                    /*
-                    --launcher / -l < chemin_du_launcher_RSI >
-                    --game / -g < chemin_du_dossier_racine_StarCitizen >
-                    --env / -e < Live | PTU | EPTU | TECHPREVIEW | HOTFIX | all >
-                    */
-                }
-                saveIni = false;
-            }
-            else
-            {
-                if (!File.Exists(iniFile))
-                {
-                    PathTools.DetectPaths(this.ini);
-                }
-                LoadIni();
+                LoadArgs(e);
             }
 
             ConfigForm configForm = new ConfigForm();
@@ -69,12 +60,12 @@ namespace SCFR
                 configForm.autoCloseTiming = 30;
             }
             
-            configForm.ShowDialog();
+            if(GetParam(ParamOption.Silent) != "1")
+                configForm.ShowDialog();
             
             this.Shutdown();
 
         }
-
         internal void LoadIni()
         {
             string key = string.Empty;
@@ -101,6 +92,82 @@ namespace SCFR
             }
 
         }
+        internal void LoadArgs(StartupEventArgs e)
+        {
+            const int PARAM = 0;
+            const int VALUE = 1;
+            StringBuilder sbError = new StringBuilder();
+
+            foreach (string arg in e.Args)
+            {
+                string[] argData;
+                int idxParam = arg.IndexOf('=');
+
+                if (idxParam == -1)
+                    argData = new string[] { arg, string.Empty };
+                else
+                    argData = arg.Split('=', idxParam);
+
+                switch (argData[PARAM].Trim().ToLower())
+                {
+                    //--launcher / -l < chemin_du_launcher_RSI >
+                    case "--launcher":
+                    case "-l":
+                        string checkLauncher = argData[VALUE].Replace("\"", "");
+                        if (!checkLauncher.EndsWith(PathTools.SC_LAUNCHER_EXE))
+                            checkLauncher = Path.Combine(checkLauncher, PathTools.SC_LAUNCHER_EXE);
+
+                        if (File.Exists(checkLauncher))
+                            SetParam(SCPathType.Launcher, checkLauncher);
+                        else
+                            sbError.AppendLine($"- Impossible de trouver le Launcher spécifié : {arg}");
+                        break;
+                    //--game / -g < chemin_du_dossier_racine_StarCitizen >
+                    case "--game":
+                    case "-g":
+                        string checkGameRoot = argData[VALUE].Replace("\"", "");
+                        if (PathTools.CheckGamePathRoot(checkGameRoot))
+                            SetParam(SCPathType.Games, checkGameRoot);
+                        else
+                            sbError.AppendLine($"- Pas d'instance StarCitizen : {arg}");
+                        break;
+                    //--env / -e < Live | PTU | EPTU | TECHPREVIEW | HOTFIX | all >
+                    case "--env":
+                    case "-e":
+                        string env = argData[VALUE].Trim();
+                        bool isAll = argData[VALUE].Equals("all", StringComparison.InvariantCultureIgnoreCase);
+
+                        foreach (GameType g in Enum.GetValues(typeof(GameType)))
+                        {
+                            if (isAll)
+                                SetParam(g, "1");
+                            else if (env.Equals(g.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                                SetParam(g, "1");
+                            else
+                                SetParam(g, "0");
+                        }
+                        break;
+                    case "--silent":
+                    case "-s":
+                        SetParam(ParamOption.Silent, "1");
+                        break;
+                }
+            }
+
+            SetParam(IniOption.AutoMaj, "1");
+
+            if (string.IsNullOrEmpty(GetParam(SCPathType.Launcher)))
+                sbError.AppendLine($"- le chemin du Launcher n'est pas spécifié");
+
+            if (string.IsNullOrEmpty(GetParam(SCPathType.Games)))
+                sbError.AppendLine($"- le chemin des instances de StarCitizen n'est pas spécifié");
+
+            if (sbError.Length > 0)
+            {
+                System.Windows.MessageBox.Show($"Une ou des anomalies ont empêché d'exécuter le programme : \n{sbError.ToString()}\n\n Merci d'utiliser le configurateur du programme de traduction ou de corriger les paramètres", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.Shutdown();
+            }
+        }
         internal string GetParam(string key)
         {
             if (param.TryGetValue(key, out string val))
@@ -114,6 +181,8 @@ namespace SCFR
         { return GetParam(type.ToString()); }
         internal string GetParam(IniOption type)
         { return GetParam(type.ToString()); }
+        internal string GetParam(ParamOption type)
+        { return GetParam(type.ToString()); }
 
         internal void SetParam(string key, string value)
         {
@@ -125,6 +194,8 @@ namespace SCFR
         internal void SetParam(SCPathType key, string val)
         { SetParam(key.ToString(), val); }
         internal void SetParam(IniOption key, string val)
+        { SetParam(key.ToString(), val); }
+        internal void SetParam(ParamOption key, string val)
         { SetParam(key.ToString(), val); }
 
         internal void LaunchStarCitizen()

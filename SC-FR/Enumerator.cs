@@ -37,6 +37,11 @@ namespace SCFR
             AutoMaj
         }
 
+        public enum ParamOption
+        {
+            Silent
+        }
+
         public enum IniSection
         { 
             None,

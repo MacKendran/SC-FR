@@ -1,11 +1,7 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static SCFR.Enumerator;
+using Path = System.IO.Path;
 
 namespace SCFR
 {
@@ -18,10 +14,11 @@ namespace SCFR
         internal const string SC_GAME_ROOT = "StarCitizen";
         internal const string SC_GAME_BIN = "Bin64";
         internal const string SC_GAME_EXE = "StarCitizen.exe";
+        internal const string SC_LAUNCHER_EXE = "RSI Launcher.exe";
 
         internal static void DetectPaths(IniFile ini)
         {
-            string pathToCheck = Path.Combine(DEFAULT_PATH, "RSI Launcher", "RSI Launcher.exe");
+            string pathToCheck = Path.Combine(DEFAULT_PATH, "RSI Launcher", SC_LAUNCHER_EXE);
             // Launcher
             if (File.Exists(pathToCheck))
             {
@@ -37,7 +34,7 @@ namespace SCFR
                 if (string.IsNullOrEmpty(regPath))
                     return;
 
-                pathToCheck = Path.Combine(regPath, "RSI Launcher.exe");
+                pathToCheck = Path.Combine(regPath, SC_LAUNCHER_EXE);
                 if (File.Exists(pathToCheck))
                 {
                     ini.Write(SCPathType.Launcher.ToString(), pathToCheck, "Path");
@@ -48,6 +45,16 @@ namespace SCFR
                 }
             }
 
+        }
+
+        internal static bool CheckGamePathRoot(string path)
+        {
+            foreach (GameType g in Enum.GetValues(typeof(GameType)))
+            {
+                if (File.Exists(Path.Combine( path, g.ToString(), SC_GAME_BIN, SC_GAME_EXE )))
+                    return true;
+            }
+            return false;
         }
 
         internal static bool DetectGamePath(string path, IniFile ini, bool eraseIfExists)
@@ -70,7 +77,7 @@ namespace SCFR
 
             if (path.EndsWith(SC_GAME_ROOT))
             {
-                if (File.Exists(Path.Combine(new string[] { path, live, SC_GAME_BIN, SC_GAME_EXE })))
+                if (CheckGamePathRoot(path))
                 {
                     ini.Write(gameType, path, IniSection.Path);
                     return true;

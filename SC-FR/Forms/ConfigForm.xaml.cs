@@ -140,8 +140,6 @@ namespace SCFR
 
         private void SaveIni()
         {
-            if (!app.saveIni)
-                return;
 
             foreach (var f in fileSelectorList)
             {
