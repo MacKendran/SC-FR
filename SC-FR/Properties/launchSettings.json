@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "SC-FR": {
+      "commandName": "Project"
+    },
+    "SC-FR PTU SILENT": {
+      "commandName": "Project",
+      "commandLineArgs": "-e=PTU -s"
+    }
+  }
+}
