@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Interop;
-using static SCFR.Enumerator;
+using static SC_FR_Library.Enumerator;
 
 namespace SCFR
 {
@@ -39,10 +39,10 @@ namespace SCFR
 
             foreach (var f in fileSelectorList)
             {
-                f.control.file = app.GetParam(f.type);
+                f.control.file = app.param.Get(f.type);
             }
 
-            CheckboxAutoLaunch.IsChecked = app.GetParam(IniOption.AutoMaj) == "1";
+            CheckboxAutoLaunch.IsChecked = app.param.Get(IniOption.AutoMaj) == "1";
             
 
         }
@@ -94,13 +94,13 @@ namespace SCFR
 
         private void ScLauncherFileSelect_PathChanged(object? sender, EventArgs e)
         {
-            app.SetParam(SCPathType.Launcher,scLauncherFileSelect.textbox.Text);
+            app.param.Set(SCPathType.Launcher,scLauncherFileSelect.textbox.Text);
         }
 
         private void ScGamePathSelect_PathChanged(object? sender, EventArgs e)
         {
             var s = sender as SelectFile;
-            app.SetParam(SCPathType.Games, scGamePathSelect.textbox.Text);
+            app.param.Set(SCPathType.Games, scGamePathSelect.textbox.Text);
 
             foreach (GameType g in Enum.GetValues(typeof(GameType)))
             {
@@ -115,9 +115,9 @@ namespace SCFR
                     }
                 }
 
-                if (PathTools.GameTypeExists(s.file, g))
+                if (WinPathTools.GameTypeExists(s.file, g))
                 {
-                    string val = app.GetParam(g);
+                    string val = app.param.Get(g);
                     if (control == null)
                     {
                         control = new GameTypeControl();
@@ -152,7 +152,7 @@ namespace SCFR
             }
             foreach (IniOption f in Enum.GetValues(typeof(IniOption)))
             {
-                app.ini.Write(f.ToString(), app.GetParam(f), IniSection.Options);
+                app.ini.Write(f.ToString(), app.param.Get(f), IniSection.Options);
             }
         }
 
@@ -179,7 +179,7 @@ namespace SCFR
         private void CheckboxAutoLaunch_Click(object sender, RoutedEventArgs e)
         {
             var s = sender as System.Windows.Controls.CheckBox;
-            app.SetParam(IniOption.AutoMaj, s.IsChecked == true ? "1" : "0");
+            app.param.Set(IniOption.AutoMaj, s.IsChecked == true ? "1" : "0");
             SaveIni();
         }
     }

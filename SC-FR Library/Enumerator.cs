@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SCFR
+namespace SC_FR_Library
 {
-    internal static class Enumerator 
+    public static class Enumerator
     {
         public enum SCPathType
         {
@@ -24,7 +24,7 @@ namespace SCFR
         }
 
         public enum ApplyTradReturn
-        { 
+        {
             Success,
             Ingnored,
             EmptyPath,
@@ -32,8 +32,9 @@ namespace SCFR
             TradNotValid,
             ErrorFile
         }
+
         public enum IniOption
-        { 
+        {
             AutoMaj
         }
 
@@ -43,7 +44,7 @@ namespace SCFR
         }
 
         public enum IniSection
-        { 
+        {
             None,
             Path,
             Options

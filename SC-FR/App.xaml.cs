@@ -1,11 +1,12 @@
-﻿using System.Diagnostics;
+﻿using SC_FR_Library;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
-using static SCFR.Enumerator;
+using static SC_FR_Library.Enumerator;
 
 namespace SCFR
 {
@@ -15,21 +16,16 @@ namespace SCFR
     public partial class App : System.Windows.Application
     {
 
-        internal const string URL_TRAD = "https://trad.sc.tasul.fr/api/file/fr";
-        internal const string TRAD_FILE_NAME = "global.ini";
-        internal const string DIR_LANGUAGE = "french_(france)";
-
-        internal const string DIR_DATA = "data";
-        internal const string DIR_LOCALIZATION = "Localization";
-
         internal string iniFile;
         internal IniFile ini;
-        internal byte[] tradFileBytes = new byte[0];
+        
+        internal Trad trad;
 
-        internal Dictionary<string, string> param = new Dictionary<string, string>();
+        internal MemoryParam param = new MemoryParam();
 
         public App() : base()
         {
+            trad = new Trad();
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             iniFile = Path.Combine(AppContext.BaseDirectory, "SC-FR.ini");
             ini = new IniFile(iniFile);
@@ -40,7 +36,7 @@ namespace SCFR
 
             if (!File.Exists(iniFile))
             {
-                PathTools.DetectPaths(this.ini);
+                WinPathTools.DetectPaths(this.ini);
             }
             LoadIni();
 
@@ -51,7 +47,7 @@ namespace SCFR
             }
 
             ConfigForm configForm = new ConfigForm();
-            if (GetParam(IniOption.AutoMaj) == "1")
+            if (param.Get(IniOption.AutoMaj) == "1")
             {
                 var progress = new ProgressForm("MAJ Automatique de la traduction",true);
                 progress.ShowDialog();
@@ -60,7 +56,7 @@ namespace SCFR
                 configForm.autoCloseTiming = 30;
             }
             
-            if(GetParam(ParamOption.Silent) != "1")
+            if(param.Get(ParamOption.Silent) != "1")
                 configForm.ShowDialog();
             
             this.Shutdown();
@@ -73,7 +69,7 @@ namespace SCFR
             foreach (SCPathType p in Enum.GetValues(typeof(SCPathType)))
             {
                 key = p.ToString();
-                SetParam(key, ini.Read(key, IniSection.Path));
+                param.Set(key, ini.Read(key, IniSection.Path));
             }
 
             foreach (GameType g in Enum.GetValues(typeof(GameType)))
@@ -81,14 +77,14 @@ namespace SCFR
                 key = g.ToString();
                 value = ini.Read(key, IniSection.Options);
                 if(value.Equals("0"))
-                    SetParam(key,"0");
+                    param.Set(key,"0");
                 else
-                    SetParam(key,"1");
+                    param.Set(key,"1");
             }
 
             foreach (IniOption o in Enum.GetValues(typeof(IniOption)))
             {
-                SetParam(o, ini.Read(o.ToString(), IniSection.Options));
+                param.Set(o, ini.Read(o.ToString(), IniSection.Options));
             }
 
         }
@@ -118,7 +114,7 @@ namespace SCFR
                             checkLauncher = Path.Combine(checkLauncher, PathTools.SC_LAUNCHER_EXE);
 
                         if (File.Exists(checkLauncher))
-                            SetParam(SCPathType.Launcher, checkLauncher);
+                            param.Set(SCPathType.Launcher, checkLauncher);
                         else
                             sbError.AppendLine($"- Impossible de trouver le Launcher spécifié : {arg}");
                         break;
@@ -127,7 +123,7 @@ namespace SCFR
                     case "-g":
                         string checkGameRoot = argData[VALUE].Replace("\"", "");
                         if (PathTools.CheckGamePathRoot(checkGameRoot))
-                            SetParam(SCPathType.Games, checkGameRoot);
+                            param.Set(SCPathType.Games, checkGameRoot);
                         else
                             sbError.AppendLine($"- Pas d'instance StarCitizen : {arg}");
                         break;
@@ -140,26 +136,26 @@ namespace SCFR
                         foreach (GameType g in Enum.GetValues(typeof(GameType)))
                         {
                             if (isAll)
-                                SetParam(g, "1");
+                                param.Set(g, "1");
                             else if (env.Equals(g.ToString(), StringComparison.InvariantCultureIgnoreCase))
-                                SetParam(g, "1");
+                                param.Set(g, "1");
                             else
-                                SetParam(g, "0");
+                                param.Set(g, "0");
                         }
                         break;
                     case "--silent":
                     case "-s":
-                        SetParam(ParamOption.Silent, "1");
+                        param.Set(ParamOption.Silent, "1");
                         break;
                 }
             }
 
-            SetParam(IniOption.AutoMaj, "1");
+            param.Set(IniOption.AutoMaj, "1");
 
-            if (string.IsNullOrEmpty(GetParam(SCPathType.Launcher)))
+            if (string.IsNullOrEmpty(param.Get(SCPathType.Launcher)))
                 sbError.AppendLine($"- le chemin du Launcher n'est pas spécifié");
 
-            if (string.IsNullOrEmpty(GetParam(SCPathType.Games)))
+            if (string.IsNullOrEmpty(param.Get(SCPathType.Games)))
                 sbError.AppendLine($"- le chemin des instances de StarCitizen n'est pas spécifié");
 
             if (sbError.Length > 0)
@@ -168,39 +164,10 @@ namespace SCFR
                 this.Shutdown();
             }
         }
-        internal string GetParam(string key)
-        {
-            if (param.TryGetValue(key, out string val))
-                return val;
-            else
-                return string.Empty;
-        }
-        internal string GetParam(SCPathType type)
-        { return GetParam(type.ToString()); }
-        internal string GetParam(GameType type)
-        { return GetParam(type.ToString()); }
-        internal string GetParam(IniOption type)
-        { return GetParam(type.ToString()); }
-        internal string GetParam(ParamOption type)
-        { return GetParam(type.ToString()); }
-
-        internal void SetParam(string key, string value)
-        {
-            if(!param.TryAdd(key, value))
-                param[key] = value;
-        }
-        internal void SetParam(GameType key, string val)
-        { SetParam(key.ToString(), val); }
-        internal void SetParam(SCPathType key, string val)
-        { SetParam(key.ToString(), val); }
-        internal void SetParam(IniOption key, string val)
-        { SetParam(key.ToString(), val); }
-        internal void SetParam(ParamOption key, string val)
-        { SetParam(key.ToString(), val); }
-
+        
         internal void LaunchStarCitizen()
         {
-            string launcherPath = this.GetParam(SCPathType.Launcher);
+            string launcherPath = param.Get(SCPathType.Launcher);
             Process.Start(launcherPath);
         }
 
@@ -211,47 +178,13 @@ namespace SCFR
             progressForm.ShowDialog();
         }
 
-        internal async Task<byte[]> LoadTrad()
-        {
-            return Task.Run(() => new HttpClient().GetByteArrayAsync(URL_TRAD)).Result;
-        }
 
-        internal void SetUserCfgLang(string path, bool remove = false)
-        {
-            string userCfgFile = Path.Combine(path, "user.cfg");
-            if (File.Exists(userCfgFile))
-            {
-                string userCfgData = File.ReadAllText(userCfgFile);
-                int langIdx = userCfgData.IndexOf("g_language =");
-                if (langIdx > -1)
-                {
-                    if (!userCfgData.Substring(langIdx + "g_language".Length).Replace("=", "").TrimStart().StartsWith("french_(france)") 
-                        || remove)
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        sb.AppendLine(userCfgData.Substring(0, langIdx));
-                        
-                        if(remove == false)
-                            sb.AppendLine("g_language = french_(france)\n");
-
-                        if (userCfgData.IndexOf("\n", langIdx) > -1)
-                            sb.Append(userCfgData.Substring(userCfgData.IndexOf("\n", langIdx) + 1));
-
-                        File.WriteAllText(userCfgFile, sb.ToString());
-                    }
-                }
-                else if (remove == false)
-                    File.AppendAllText(userCfgFile, $@"g_language = french_(france)");
-            }
-            else if (remove == false)
-                File.WriteAllText(userCfgFile, $@"g_language = french_(france)");
-        }
-
+        /*
         internal ApplyTradReturn ApplyTrad(GameType gameType)
         {
 
-            string path = this.GetParam(SCPathType.Games);
-            string activeKey = this.GetParam(gameType);
+            string path = param.Get(SCPathType.Games);
+            string activeKey = param.Get(gameType);
 
             if (activeKey == "0")
                 return ApplyTradReturn.Ingnored;
@@ -259,17 +192,17 @@ namespace SCFR
             if (string.IsNullOrEmpty(path))
                 return ApplyTradReturn.EmptyPath;
 
-            if (tradFileBytes == null)
+            if (!trad.isDownloaded)
                 return ApplyTradReturn.TradNotValid;
 
-            
-            path = Path.Combine( path,gameType.ToString());
 
-            if(!Directory.Exists(path))
+            path = Path.Combine(path, gameType.ToString());
+
+            if (!Directory.Exists(path))
                 return ApplyTradReturn.Ingnored;
 
-            if (!File.Exists(Path.Combine(path,PathTools.SC_GAME_BIN,"StarCitizen.exe")))
-                return ApplyTradReturn.InvalidPath ;
+            if (!File.Exists(Path.Combine(path, PathTools.SC_GAME_BIN, "StarCitizen.exe")))
+                return ApplyTradReturn.InvalidPath;
 
             SetUserCfgLang(path);
 
@@ -277,7 +210,7 @@ namespace SCFR
 
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
-            
+
 
             string tradFile = Path.Combine(path, TRAD_FILE_NAME);
 
@@ -286,15 +219,11 @@ namespace SCFR
 
             try
             {
-                using var writer = new FileStream(tradFile, FileMode.Create);
-                var taskWriter = writer.BeginWrite(tradFileBytes, 0, tradFileBytes.Length, null, null);
-
+                var taskWriter = trad.WriteTrad(tradFile);
                 while (!taskWriter.IsCompleted)
                 {
                     Thread.Sleep(100);
                 }
-                writer.Flush(true);
-                writer.Close();
             }
             catch (Exception ex)
             {
@@ -303,6 +232,6 @@ namespace SCFR
             }
 
             return ApplyTradReturn.Success;
-        }
+        }*/
     }
 }

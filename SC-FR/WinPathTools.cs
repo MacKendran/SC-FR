@@ -1,20 +1,16 @@
 ﻿using Microsoft.Win32;
 using System.IO;
-using static SCFR.Enumerator;
+using static SC_FR_Library.Enumerator;
 using Path = System.IO.Path;
 
 namespace SCFR
 {
-    internal static class PathTools
+    public class WinPathTools : SC_FR_Library.PathTools
     {
         internal const string REG_RSI = "81bfc699-f883-50c7-b674-2483b6baae23";
 
         const string DEFAULT_PATH = @"C:\Program Files\Roberts Space Industries\";
 
-        internal const string SC_GAME_ROOT = "StarCitizen";
-        internal const string SC_GAME_BIN = "Bin64";
-        internal const string SC_GAME_EXE = "StarCitizen.exe";
-        internal const string SC_LAUNCHER_EXE = "RSI Launcher.exe";
 
         internal static void DetectPaths(IniFile ini)
         {
@@ -45,16 +41,6 @@ namespace SCFR
                 }
             }
 
-        }
-
-        internal static bool CheckGamePathRoot(string path)
-        {
-            foreach (GameType g in Enum.GetValues(typeof(GameType)))
-            {
-                if (File.Exists(Path.Combine( path, g.ToString(), SC_GAME_BIN, SC_GAME_EXE )))
-                    return true;
-            }
-            return false;
         }
 
         internal static bool DetectGamePath(string path, IniFile ini, bool eraseIfExists)
@@ -91,11 +77,6 @@ namespace SCFR
             }
 
             return false;
-        }
-
-        internal static bool GameTypeExists(string gamePath, GameType gameType)
-        {
-            return File.Exists(Path.Combine(new string[] { gamePath, gameType.ToString(), SC_GAME_BIN, SC_GAME_EXE }));
         }
 
     }

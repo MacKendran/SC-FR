@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MessageBox = System.Windows.MessageBox;
-using static SCFR.Enumerator;
+using static SC_FR_Library.Enumerator;
 
 namespace SCFR
 {
@@ -72,7 +72,7 @@ namespace SCFR
             var p = (App)System.Windows.Application.Current;
             var w = (sender as BackgroundWorker);
 
-            if (string.IsNullOrEmpty(p.GetParam(SCPathType.Games)))
+            if (string.IsNullOrEmpty(p.param.Get(SCPathType.Games)))
             {
                 MessageBox.Show("Aucun chemin pour les répertoires d'instance de StarCitizen", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -80,7 +80,7 @@ namespace SCFR
 
             int percent = 1;
 
-            var downloadTrad = p.LoadTrad();
+            var downloadTrad = p.trad.DownloadTrad();
             while (!downloadTrad.IsCompletedSuccessfully)
             {
                 w.ReportProgress(percent);
@@ -92,7 +92,6 @@ namespace SCFR
                 Thread.Sleep(1000);
                 percent++;
             }
-            p.tradFileBytes = downloadTrad.Result;
             percent = 60;
             w.ReportProgress(percent);
 
@@ -101,8 +100,17 @@ namespace SCFR
 
             foreach (GameType gameType in gameTypes)
             {
+                
+                string activeKey = p.param.Get(gameType);
 
-                resultList.Add((gameType, p.ApplyTrad(gameType)));
+                if (activeKey == "0")
+                    resultList.Add((gameType, ApplyTradReturn.Ingnored));
+                else
+                {
+                    string path = p.param.Get(SCPathType.Games);
+                    resultList.Add((gameType, p.trad.ApplyTrad(gameType, path)));
+                }
+                
                 percent += 40 / gameTypes.Length ;
                 w.ReportProgress(percent);
             }

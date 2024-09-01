@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
-using static SCFR.Enumerator;
+using static SC_FR_Library.Enumerator;
 
 namespace SCFR
 {

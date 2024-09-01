@@ -18,7 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
-using static SCFR.Enumerator;
+using static SC_FR_Library.Enumerator;
 
 
 namespace SCFR
@@ -84,7 +84,7 @@ namespace SCFR
                 {
                     foreach (GameType g in Enum.GetValues(typeof(GameType)))
                     {
-                        if (PathTools.GameTypeExists(folderBrowserDialog.SelectedPath, g))
+                        if (WinPathTools.GameTypeExists(folderBrowserDialog.SelectedPath, g))
                         {
                             SetFile(folderBrowserDialog.SelectedPath);
                             return;

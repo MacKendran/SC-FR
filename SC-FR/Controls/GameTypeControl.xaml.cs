@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Path = System.IO.Path;
-using static SCFR.Enumerator;
+using static SC_FR_Library.Enumerator;
 
 namespace SCFR.Controls
 {
@@ -28,7 +28,6 @@ namespace SCFR.Controls
         internal const string DIR_LANGUAGE = "french_(france)";
         internal const string DIR_DATA = "data";
         internal const string DIR_LOCALIZATION = "Localization";
-
 
         internal GameType gameType;
         public string text
@@ -90,7 +89,7 @@ namespace SCFR.Controls
                 {
                     var p = (App)App.Current;
                     
-                    string path = Path.Combine(p.GetParam(SCPathType.Games),text);
+                    string path = Path.Combine(p.param.Get(SCPathType.Games),text);
                     string file = Path.Combine(path,DIR_DATA,DIR_LOCALIZATION,DIR_LANGUAGE,TRAD_FILE_NAME);
 
 
@@ -98,7 +97,7 @@ namespace SCFR.Controls
                         && (System.Windows.MessageBox.Show("Voulez-vous supprimer le fichier de traduction ?",$"Fichier de traduction {text}",MessageBoxButton.YesNo,MessageBoxImage.Question) == MessageBoxResult.Yes)) 
                     {   
                         File.Delete(file);
-                        p.SetUserCfgLang(path, true);
+                        p.trad.SetUserCfgLang(path, true);
                     }
                 }
             }
