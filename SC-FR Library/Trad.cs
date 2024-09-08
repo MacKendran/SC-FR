@@ -1,25 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Net.Http.Json;
 using System.Text;
-using System.Threading.Tasks;
 using static SC_FR_Library.Enumerator;
+
+using File = System.IO.File;
 
 namespace SC_FR_Library
 {
+    public class JsonTradVersion
+    {
+        public string service { get; set; }
+        public string version1 { get; set; }
+        public string version2 { get; set; }
+        public string lastPush { get; set; }
+        public string update { get; set; }
+    }
+
     public class Trad
     {
 
         internal const string TRAD_FILE_NAME = "global.ini";
         internal const string DIR_LANGUAGE = "french_(france)";
 
-        internal const string URL_TRAD = "https://trad.sc.tasul.fr/api/file/fr";
+        internal const string URL_BASE = "https://trad.sc.tasul.fr/";
+
+        internal const string URL_TRAD = URL_BASE + "api/file/fr";
+        internal const string URL_VERSION = URL_BASE + "version/versions";
+
         internal byte[] tradFileBytes = new byte[0];
+
+        public JsonTradVersion version = null;
+        public bool? getVersionFailed;
+
 
         public bool isDownloaded { get; private set; }
 
         public Trad()
-        { }
+        { 
+            LoadVersion();
+        }
+
+        private async void LoadVersion()
+        {
+            try
+            {
+                this.version = await new HttpClient().GetFromJsonAsync<JsonTradVersion>(URL_VERSION);
+                this.getVersionFailed = false;
+            }
+            catch(Exception e) 
+            {
+                this.getVersionFailed = true;
+            }
+        }
 
         public async Task<(bool,Exception)> DownloadTrad()
         {

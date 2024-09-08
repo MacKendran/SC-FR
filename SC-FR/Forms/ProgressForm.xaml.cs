@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MessageBox = System.Windows.MessageBox;
 using static SC_FR_Library.Enumerator;
+using SC_FR_Library;
 
 namespace SCFR
 {
@@ -80,6 +81,28 @@ namespace SCFR
 
             int percent = 1;
 
+            while (!p.trad.getVersionFailed.HasValue)
+            { 
+                Thread.Sleep(100);
+            }
+
+            if (p.trad.getVersionFailed.HasValue && p.trad.getVersionFailed.Value == true)
+            {
+                MessageBox.Show("Impossible d'obtenir les informations de version de la traduction", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (!p.NeedToUpgrade())
+            {
+                percent = 100;
+                w.ReportProgress(percent);
+                e.Cancel = true;
+                if (!silentSuccess)
+                    this.Dispatcher.Invoke(()=>MessageBox.Show(this, $"la version {p.trad.version.version1} est déjà installée."));
+                    
+                return;
+            }
+
             var downloadTrad = p.trad.DownloadTrad();
             while (!downloadTrad.IsCompletedSuccessfully)
             {
@@ -97,7 +120,6 @@ namespace SCFR
 
             var gameTypes = System.Enum.GetValues(typeof(GameType));
             var resultList = new List<(GameType type, ApplyTradReturn result)>();
-
             foreach (GameType gameType in gameTypes)
             {
                 
@@ -108,7 +130,13 @@ namespace SCFR
                 else
                 {
                     string path = p.param.Get(SCPathType.Games);
-                    resultList.Add((gameType, p.trad.ApplyTrad(gameType, path)));
+                    var res = p.trad.ApplyTrad(gameType, path);
+                    resultList.Add((gameType, res));
+                    if (res == ApplyTradReturn.Success)
+                    {
+                        p.param.Set(ParamVersion.version, gameType, p.trad.version.version1);
+                        p.ini.Write(gameType.ToString(), p.trad.version.version1, IniSection.Versions);
+                    }
                 }
                 
                 percent += 40 / gameTypes.Length ;
@@ -119,7 +147,7 @@ namespace SCFR
             w.ReportProgress(100);
 
             if (countSuccess == resultList.Count)
-            {
+            {                
                 if (!silentSuccess)
                     MessageBox.Show("Mise à jour effectuée", "Mise à jour", MessageBoxButton.OK, MessageBoxImage.Information);
             }

@@ -80,6 +80,10 @@ namespace SCFR
                     param.Set(key,"0");
                 else
                     param.Set(key,"1");
+
+                value = ini.Read(key, IniSection.Versions);
+                if(!string.IsNullOrEmpty(value))
+                    param.Set(ParamVersion.version,g,value);
             }
 
             foreach (IniOption o in Enum.GetValues(typeof(IniOption)))
@@ -164,7 +168,28 @@ namespace SCFR
                 this.Shutdown();
             }
         }
-        
+
+        internal bool NeedToUpgrade()
+        {
+            if(param.Get(ParamOption.ForceDownload) == "1")
+                return true;
+
+            var gameTypes = Enum.GetValues(typeof(GameType));
+            foreach (GameType gameType in gameTypes)
+            {
+
+                if(!PathTools.GameTypeExists(param.Get(SCPathType.Games),gameType))
+                    continue;
+
+                string activeKey = param.Get(gameType);
+                if (activeKey == "1")
+                {
+                    if (!param.Get(ParamVersion.version, gameType).Equals(trad.version.version1))
+                        return true;
+                }
+            }
+            return false;
+        }
         internal void LaunchStarCitizen()
         {
             string launcherPath = param.Get(SCPathType.Launcher);

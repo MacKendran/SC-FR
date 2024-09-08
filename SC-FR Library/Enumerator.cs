@@ -33,6 +33,12 @@ namespace SC_FR_Library
             ErrorFile
         }
 
+        public enum ParamVersion
+        {
+            version,
+            lastUpdate
+        }
+
         public enum IniOption
         {
             AutoMaj
@@ -40,14 +46,16 @@ namespace SC_FR_Library
 
         public enum ParamOption
         {
-            Silent
+            Silent,
+            ForceDownload
         }
 
         public enum IniSection
         {
             None,
             Path,
-            Options
+            Options,
+            Versions
         }
 
     }
