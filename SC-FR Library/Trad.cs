@@ -18,8 +18,8 @@ namespace SC_FR_Library
     public class Trad
     {
 
-        internal const string TRAD_FILE_NAME = "global.ini";
-        internal const string DIR_LANGUAGE = "french_(france)";
+        public const string TRAD_FILE_NAME = "global.ini";
+        public const string DIR_LANGUAGE = "french_(france)";
 
         internal const string URL_BASE = "https://trad.sc.tasul.fr/";
 

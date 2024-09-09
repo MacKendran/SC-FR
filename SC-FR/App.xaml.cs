@@ -151,6 +151,10 @@ namespace SCFR
                     case "-s":
                         param.Set(ParamOption.Silent, "1");
                         break;
+                    case "--force":
+                    case "-f":
+                        param.Set(ParamOption.ForceDownload, "1");
+                        break;
                 }
             }
 
@@ -184,7 +188,8 @@ namespace SCFR
                 string activeKey = param.Get(gameType);
                 if (activeKey == "1")
                 {
-                    if (!param.Get(ParamVersion.version, gameType).Equals(trad.version.version1))
+                    var fileTrad = Path.Combine(new string[] { param.Get(SCPathType.Games), gameType.ToString(), PathTools.DIR_DATA, PathTools.DIR_LOCALIZATION, Trad.DIR_LANGUAGE, Trad.TRAD_FILE_NAME });
+                    if (!param.Get(ParamVersion.version, gameType).Equals(trad.version.version1) || !File.Exists(fileTrad))
                         return true;
                 }
             }
