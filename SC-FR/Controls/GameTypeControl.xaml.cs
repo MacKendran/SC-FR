@@ -98,6 +98,7 @@ namespace SCFR.Controls
                     {   
                         File.Delete(file);
                         p.trad.SetUserCfgLang(path, true);
+                        p.param.Set(ParamVersion.version,this.gameType,string.Empty);
                     }
                 }
             }
