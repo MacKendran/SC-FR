@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using MessageBox = System.Windows.MessageBox;
 using static SC_FR_Library.Enumerator;
 using SC_FR_Library;
+using System.Windows.Threading;
 
 namespace SCFR
 {
@@ -104,17 +105,23 @@ namespace SCFR
             }
 
             var downloadTrad = p.trad.DownloadTrad();
-            while (!downloadTrad.IsCompletedSuccessfully)
+            while (!downloadTrad.IsCompleted)
             {
                 w.ReportProgress(percent);
-                if (downloadTrad.IsFaulted)
-                {
-                    MessageBox.Show("une erreur est survenue au téléchargement du fichier de traduction", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
                 Thread.Sleep(1000);
                 percent++;
             }
+            if (downloadTrad.Exception != null)
+            {
+                MessageBox.Show($"une exception est survenue pendant le téléchargement du fichier de traduction\n\n{downloadTrad.Exception.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (downloadTrad.IsFaulted || downloadTrad.IsCanceled || downloadTrad.Result == false)
+            {
+                MessageBox.Show("une erreur est survenue au téléchargement du fichier de traduction", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             percent = 60;
             w.ReportProgress(percent);
 

@@ -52,25 +52,20 @@ namespace SC_FR_Library
             }
         }
 
-        public async Task<(bool,Exception)> DownloadTrad()
+        public async Task<bool> DownloadTrad()
         {
+            this.tradFileBytes = new byte[0];
             isDownloaded = false;
-            try
+            
+            var r =  await Task.Run(() => new HttpClient().GetByteArrayAsync(URL_TRAD));
+            if (r != null)
             {
-                var r =  await Task.Run(() => new HttpClient().GetByteArrayAsync(URL_TRAD));
-                if (r != null)
-                {
-                    this.tradFileBytes = r;
-                    isDownloaded = true;
-                    return (true,null);
-                }
-            }
-            catch (Exception ex)
-            {
-                return(false,ex);
+                this.tradFileBytes = r;
+                isDownloaded = true;
+                return (true);
             }
 
-            return (false, null);
+            return (false);
         }
 
         public async Task WriteTrad(string tradFile)
