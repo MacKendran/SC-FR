@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SC-FR Library", "SC-FR Library\SC-FR Library.csproj", "{6D07115F-DA0F-4E2D-BC3E-A50F0941FCAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SC-FR Library", "SC-FR Library\SC-FR Library.csproj", "{6D07115F-DA0F-4E2D-BC3E-A50F0941FCAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

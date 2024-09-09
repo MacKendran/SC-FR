@@ -3,9 +3,9 @@
     "SC-FR": {
       "commandName": "Project"
     },
-    "SC-FR PTU SILENT": {
+    "SC-FR ALL SILENT FORCE": {
       "commandName": "Project",
-      "commandLineArgs": "-e=PTU -s"
+      "commandLineArgs": "-e=ALL -s -f"
     }
   }
 }
