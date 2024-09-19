@@ -189,7 +189,7 @@ namespace SCFR
                 if (activeKey == "1")
                 {
                     var fileTrad = Path.Combine(new string[] { param.Get(SCPathType.Games), gameType.ToString(), PathTools.DIR_DATA, PathTools.DIR_LOCALIZATION, Trad.DIR_LANGUAGE, Trad.TRAD_FILE_NAME });
-                    if (!param.Get(ParamVersion.version, gameType).Equals(trad.version.version1) || !File.Exists(fileTrad))
+                    if (!param.Get(ParamVersion.version, gameType).Equals(trad.version.update) || !File.Exists(fileTrad))
                         return true;
                 }
             }

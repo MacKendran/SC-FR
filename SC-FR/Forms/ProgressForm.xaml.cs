@@ -99,7 +99,7 @@ namespace SCFR
                 w.ReportProgress(percent);
                 e.Cancel = true;
                 if (!silentSuccess)
-                    this.Dispatcher.Invoke(()=>MessageBox.Show(this, $"la version {p.trad.version.version1} est déjà installée."));
+                    this.Dispatcher.Invoke(()=>MessageBox.Show(this, $"la version {p.trad.version.update} est déjà installée."));
                     
                 return;
             }
@@ -141,8 +141,8 @@ namespace SCFR
                     resultList.Add((gameType, res));
                     if (res == ApplyTradReturn.Success)
                     {
-                        p.param.Set(ParamVersion.version, gameType, p.trad.version.version1);
-                        p.ini.Write(gameType.ToString(), p.trad.version.version1, IniSection.Versions);
+                        p.param.Set(ParamVersion.version, gameType, p.trad.version.update);
+                        p.ini.Write(gameType.ToString(), p.trad.version.update, IniSection.Versions);
                     }
                 }
                 
