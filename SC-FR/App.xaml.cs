@@ -27,7 +27,7 @@ namespace SCFR
         {
             trad = new Trad();
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            iniFile = Path.Combine(AppContext.BaseDirectory, "SC-FR.ini");
+            iniFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"SC-FR", "SC-FR.ini");
             ini = new IniFile(iniFile);
         }
         protected override void OnStartup(StartupEventArgs e)
@@ -36,6 +36,10 @@ namespace SCFR
 
             if (!File.Exists(iniFile))
             {
+                if (!Directory.Exists(Path.GetDirectoryName(iniFile)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(iniFile));
+                }
                 WinPathTools.DetectPaths(this.ini);
             }
             LoadIni();
