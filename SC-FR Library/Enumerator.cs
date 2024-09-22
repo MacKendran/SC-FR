@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,12 +18,14 @@ namespace SC_FR_Library
 
         public enum GameType
         {
-            Live,
-            PTU,
-            EPTU,
-            TECHPREVIEW,
-            HOTFIX
-        }
+            Live = 0,
+            PTU = 1,
+            EPTU = 2,
+            TECHPREVIEW = 3,
+            HOTFIX = 4
+        }       
+
+        public static string[] GameTypePathSection = new string[] { "Live", "PTU", "EPTU","TECH-PREVIEW","HOTFIX" };
 
         public enum ApplyTradReturn
         {

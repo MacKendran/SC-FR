@@ -123,7 +123,7 @@ namespace SC_FR_Library
                 return ApplyTradReturn.TradNotValid;
 
 
-            path = Path.Combine(path, gameType.ToString());
+            path = Path.Combine(path, PathTools.GetGamePathSection(gameType));
 
             if (!Directory.Exists(path))
                 return ApplyTradReturn.Ingnored;

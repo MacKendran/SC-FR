@@ -18,11 +18,16 @@ namespace SC_FR_Library
         public const string DIR_LOCALIZATION = "Localization";
 
 
+        public static string GetGamePathSection(GameType gameType)
+        {
+            return GameTypePathSection[(int)gameType];
+        }
+
         public static bool CheckGamePathRoot(string path)
         {
             foreach (GameType g in Enum.GetValues(typeof(GameType)))
             {
-                if (File.Exists(Path.Combine(path, g.ToString(), SC_GAME_BIN, SC_GAME_EXE)))
+                if (File.Exists(Path.Combine(path, GetGamePathSection(g), SC_GAME_BIN, SC_GAME_EXE)))
                     return true;
             }
             return false;
@@ -30,7 +35,7 @@ namespace SC_FR_Library
 
         public static bool GameTypeExists(string gamePath, GameType gameType)
         {
-            return File.Exists(Path.Combine(new string[] { gamePath, gameType.ToString(), SC_GAME_BIN, SC_GAME_EXE }));
+            return File.Exists(Path.Combine(new string[] { gamePath, GetGamePathSection(gameType), SC_GAME_BIN, SC_GAME_EXE }));
         }
 
     }
