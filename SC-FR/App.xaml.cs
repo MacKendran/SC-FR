@@ -207,6 +207,8 @@ namespace SCFR
 
         internal void UpdateTrad(bool silentSuccess)
         {
+            trad.LoadVersion();
+
             var progressForm = new ProgressForm("Mise à jour de la traduction",silentSuccess);
             progressForm.Activate();
             progressForm.ShowDialog();

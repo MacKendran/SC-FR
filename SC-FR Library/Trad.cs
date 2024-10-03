@@ -39,7 +39,7 @@ namespace SC_FR_Library
             LoadVersion();
         }
 
-        private async void LoadVersion()
+        public async void LoadVersion()
         {
             try
             {
