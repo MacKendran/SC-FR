@@ -1,0 +1,88 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SCFR"
+        xmlns:Controls="clr-namespace:SCFR.Controls" x:Class="SCFR.ConfigForm"
+        mc:Ignorable="d"
+        Title="SC-FR Config" Height="220" Width="600" ResizeMode="CanMinimize">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="15"/>
+        </Grid.RowDefinitions>
+        <local:SelectFile x:Name="scLauncherFileSelect" 
+                          HorizontalAlignment="Stretch" 
+                          Margin="5,5,5,5" 
+                          VerticalAlignment="Stretch" 
+                          labelText="RSI Launcher"
+                          filterFile="Launcher (RSI Launcher.exe)|RSI*Launcher.exe"
+                          Grid.Column="0" 
+                          Grid.Row="0"
+                          Grid.ColumnSpan="3"/>
+        <local:SelectFile x:Name="scGamePathSelect" 
+                          HorizontalAlignment="Stretch" 
+                          Margin="5,5,5,5" 
+                          VerticalAlignment="Stretch" 
+                          labelText="Game Folder"
+                          filterFile=""
+                          Grid.Column="0" 
+                          Grid.Row="1"
+                          Grid.ColumnSpan="3"/>
+        <Button x:Name="bUpdate"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Center"
+        Content="Maj Trad"
+        Grid.Column="2" 
+        Grid.Row="4"
+        Click="bUpdate_Click"
+        Margin="0,0,140,0"
+        />
+        <Button x:Name="bExeSC"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Content="Executer StarCitizen"
+                Grid.Column="2" 
+                Grid.Row="4"
+                Click="bExeSC_Click"
+                Margin="0,0,20,0"
+                />
+
+        <WrapPanel x:Name="GameControlPanel" 
+                   Orientation="Horizontal" 
+                   Grid.Row="2" 
+                   Grid.RowSpan="2" 
+                   Grid.Column="0" 
+                   Grid.ColumnSpan="3"/>
+
+        <CheckBox x:Name="CheckboxAutoLaunch" 
+                  Content="Mise à jour et lancement automatique" 
+                  HorizontalAlignment="Left" 
+                  Margin="8,8,0,0" 
+                  Grid.Row="4" 
+                  VerticalAlignment="Top" 
+                  Grid.ColumnSpan="2"
+                  Click="CheckboxAutoLaunch_Click"/>
+        <Label x:Name="labelAutoClose" 
+               Visibility="Hidden"
+               Content="xxx"
+               HorizontalAlignment="Stretch" 
+               Margin="10,0,0,0" 
+               Grid.Row="5" 
+               VerticalAlignment="Center" 
+               Grid.ColumnSpan="2"
+               Grid.RowSpan="2"/>
+    </Grid>
+
+</Window>

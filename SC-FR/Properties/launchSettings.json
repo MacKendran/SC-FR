@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "SC-FR": {
+      "commandName": "Project"
+    },
+    "SC-FR ALL SILENT FORCE": {
+      "commandName": "Project",
+      "commandLineArgs": "-e=ALL -s -f"
+    }
+  }
+}
