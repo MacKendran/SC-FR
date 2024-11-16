@@ -62,5 +62,20 @@ namespace SC_FR_Library
             Versions
         }
 
+        public enum TradElement
+        { 
+            UI,
+            UI_Ship,
+            Item,
+            Mission
+        }
+
+        public enum TradType
+        {
+            VO = 0,
+            SCFR = 1,
+            Speedou = 2,
+            Circus = 3
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SCFR.Controls;
+﻿using SC_FR.Forms;
+using SCFR.Controls;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -171,7 +172,7 @@ namespace SCFR
 
             var p = (App)System.Windows.Application.Current;
 
-            p.UpdateTrad(false);
+            p.UpdateTrad(false, true);
             
             return;
         }
@@ -181,6 +182,19 @@ namespace SCFR
             var s = sender as System.Windows.Controls.CheckBox;
             app.param.Set(IniOption.AutoMaj, s.IsChecked == true ? "1" : "0");
             SaveIni();
+        }
+
+        private void bConfigTrad_Click(object sender, RoutedEventArgs e)
+        {
+            this.autoClose = false;
+            labelAutoClose.Visibility = Visibility.Hidden;
+            this.timer.Stop();
+
+            SaveIni();
+
+            var form = new ConfigTradForm();
+            form.ShowDialog();
+            
         }
     }
 }

@@ -95,6 +95,14 @@ namespace SCFR
                 param.Set(o, ini.Read(o.ToString(), IniSection.Options));
             }
 
+            foreach (TradElement o in Enum.GetValues(typeof(TradElement)))
+            {
+                string v = ini.Read(o.ToString(), IniSection.Options);
+                if (string.IsNullOrEmpty(v))
+                    param.Set(o, TradType.SCFR.ToString());
+                else
+                    param.Set(o, v);
+            }
         }
         internal void LoadArgs(StartupEventArgs e)
         {
@@ -205,11 +213,11 @@ namespace SCFR
             Process.Start(launcherPath);
         }
 
-        internal void UpdateTrad(bool silentSuccess)
+        internal void UpdateTrad(bool silentSuccess,bool forceUpdate = false)
         {
             trad.LoadVersion();
 
-            var progressForm = new ProgressForm("Mise à jour de la traduction",silentSuccess);
+            var progressForm = new ProgressForm("Mise à jour de la traduction",silentSuccess,forceUpdate);
             progressForm.Activate();
             progressForm.ShowDialog();
         }

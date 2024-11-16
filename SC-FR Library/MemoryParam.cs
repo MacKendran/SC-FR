@@ -9,6 +9,8 @@ namespace SC_FR_Library
 {
     public class MemoryParam
     {
+        private const string tradOption = "trad_op";
+
 
         internal Dictionary<string, string> param = new Dictionary<string, string>();
 
@@ -34,6 +36,14 @@ namespace SC_FR_Library
         { return Get(version.ToString()+"_"+game.ToString());}
         public string Get(ParamVersion type)
         { return Get(type.ToString()); }
+        public string Get(TradElement tradOption)
+        { 
+            string v = Get(tradOption + tradOption.ToString());
+            if (string.IsNullOrEmpty(v))
+                return TradType.SCFR.ToString();
+
+            return v;
+        }
 
         public void Set(string key, string value)
         {
@@ -52,5 +62,8 @@ namespace SC_FR_Library
         { Set(key.ToString(), val); }
         public void Set(ParamVersion version, GameType game, string val)
         { Set(version.ToString() + "_" + game.ToString(),val); }
+        public void Set(TradElement tradOption, string val)
+        { Set(tradOption + tradOption.ToString(), val); }
+
     }
 }

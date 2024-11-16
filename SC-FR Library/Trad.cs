@@ -24,6 +24,7 @@ namespace SC_FR_Library
         internal const string URL_BASE = "https://trad.sc.tasul.fr/";
 
         internal const string URL_TRAD = URL_BASE + "api/file/fr";
+        internal const string URL_TRAD_CUSTOM = URL_BASE + "api/file/custom?ui={0}&uiship={1}&item={2}&mission={3}";
         internal const string URL_VERSION = URL_BASE + "version/versions";
 
         internal byte[] tradFileBytes = new byte[0];
@@ -51,6 +52,25 @@ namespace SC_FR_Library
                 this.getVersionFailed = true;
             }
         }
+
+        public async Task<bool> DownloadTradCustom(TradType ui, TradType uiShip, TradType item, TradType mission)
+        {
+            this.tradFileBytes = new byte[0];
+            isDownloaded = false;
+
+            string url = string.Format(URL_TRAD_CUSTOM,(int)ui,(int)uiShip,(int)item,(int)mission);
+
+            var r = await Task.Run(() => new HttpClient().GetByteArrayAsync(url));
+            if (r != null)
+            {
+                this.tradFileBytes = r;
+                isDownloaded = true;
+                return (true);
+            }
+
+            return (false);
+        }
+
 
         public async Task<bool> DownloadTrad()
         {
