@@ -5,24 +5,45 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SCFR.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="60" d:DesignWidth="50">
+             d:DesignHeight="60" d:DesignWidth="80">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="80"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="20"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
+        <Rectangle Grid.RowSpan="3" Margin="0,0,0,0" Stroke="Black"></Rectangle>
         <Label x:Name="label" 
                Content="{Binding text, RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" 
                HorizontalAlignment="Stretch" 
                VerticalAlignment="Center" 
                HorizontalContentAlignment="Center"
                Grid.Row="0" 
-               Margin="0,-5,0,0"/>
-        <CheckBox x:Name="checkbox" Content="" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" IsChecked="False" Width="16" Click="checkbox_Click"/>
-
+               Margin="0,-5,0,0" 
+               Width="80"
+               FontWeight="Bold"/>
+        <CheckBox x:Name="checkbox" 
+                  Grid.Row="1" 
+                  VerticalAlignment="Center" 
+                  HorizontalAlignment="Center"
+                  IsChecked="False" 
+                  Click="checkbox_Click" 
+                  Margin="0,0,0,0"
+                  ToolTip="Activer ou désactiver la traduction"/>
+        <Menu Grid.Row="2" 
+              Background="LightGray" 
+              HorizontalContentAlignment="Center" 
+              Width="20"
+              Margin="28,1,30,2">
+            <MenuItem Header="…" HorizontalContentAlignment="Center">
+                <MenuItem x:Name="mTrad" Header="Activer/désactiver la traduction" Click="mTrad_Click"/>
+                <Separator/>
+                <MenuItem x:Name="mOpenScreenShot" Header="Ouvrir les screenshots" Click="mOpenScreenShot_Click"/>
+                
+            </MenuItem>
+        </Menu>
     </Grid>
 </UserControl>

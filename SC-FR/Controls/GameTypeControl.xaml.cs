@@ -15,6 +15,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Path = System.IO.Path;
 using static SC_FR_Library.Enumerator;
+using System.Diagnostics;
+using MessageBox = System.Windows.MessageBox;
 
 namespace SCFR.Controls
 {
@@ -23,6 +25,8 @@ namespace SCFR.Controls
     /// </summary>
     public partial class GameTypeControl : System.Windows.Controls.UserControl
     {
+
+        App app = (App)System.Windows.Application.Current;
 
         internal const string TRAD_FILE_NAME = "global.ini";
         internal const string DIR_LANGUAGE = "french_(france)";
@@ -102,6 +106,22 @@ namespace SCFR.Controls
                     }
                 }
             }
+        }
+
+        private void mOpenScreenShot_Click(object sender, RoutedEventArgs e)
+        {
+            string path = Path.Combine(app.param.Get(SCPathType.Games),this.gameType.ToString(),"screenshots");
+
+            if (Directory.Exists(path))
+                Process.Start("explorer.exe",$"\"{path}\"");
+            else
+                MessageBox.Show($@"le répertoire {path} n'existe pas");
+        }
+
+        private void mTrad_Click(object sender, RoutedEventArgs e)
+        {
+            this.isChecked = !this.isChecked;
+            checkbox_Click(sender, e);
         }
     }
 }
