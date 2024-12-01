@@ -1,11 +1,15 @@
 ﻿using SC_FR.Forms;
 using SCFR.Controls;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Input;
 using System.Windows.Interop;
 using static SC_FR_Library.Enumerator;
+using MessageBox = System.Windows.MessageBox;
 
 namespace SCFR
 {
@@ -196,5 +200,49 @@ namespace SCFR
             form.ShowDialog();
             
         }
+
+
+
+        private void bDeleteShader_Click(object sender, RoutedEventArgs e)
+        {
+            this.autoClose = false;
+            labelAutoClose.Visibility = Visibility.Hidden;
+            this.timer.Stop();
+
+            app.Dispatcher.Invoke(() => { Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait; });
+
+            var scExe = Process.GetProcessesByName("starcitizen.exe");
+            if ( scExe.Count() > 0)
+            {
+                MessageBox.Show("une instance de Star Citizen est en cours d'execution veuillez quitter le jeu","Suppression des shaders",MessageBoxButton.OK,MessageBoxImage.Stop);
+                return;
+            }
+            
+            var shaderDir = Directory.GetDirectories(Path.GetDirectoryName(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Star Citizen\\")));
+            string[] dirToDelete = new string[] { "shaders", "VulkanShaderCache" };
+            try
+            {
+
+                foreach (var shaderPath in shaderDir)
+                {
+                    foreach (string dir in dirToDelete)
+                    {
+                        string path = Path.Combine(shaderPath, dir);
+                        if (Directory.Exists(path))
+                        {
+                            Directory.Delete(path, true);
+                        }
+                    }
+                }
+                MessageBox.Show("Suppression des shaders effectuée");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show($"une erreur est survenue, l'opération est avortée\n\nDescription de l'erreur : {ex.Message}", "Suppression des shaders", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            app.Dispatcher.Invoke(() => { Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow; });
+
+        }
+
     }
 }

@@ -6,10 +6,10 @@
         xmlns:local="clr-namespace:SCFR"
         xmlns:Controls="clr-namespace:SCFR.Controls" x:Class="SCFR.ConfigForm"
         mc:Ignorable="d"
-        Title="SC-FR Config" Height="220" Width="600" ResizeMode="CanMinimize">
+        Title="SC-FR Config" Height="275" Width="600" ResizeMode="CanMinimize">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="235"/>
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
@@ -18,9 +18,8 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="15"/>
+            <RowDefinition Height="90"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <local:SelectFile x:Name="scLauncherFileSelect" 
                           HorizontalAlignment="Stretch" 
@@ -40,31 +39,63 @@
                           Grid.Column="0" 
                           Grid.Row="1"
                           Grid.ColumnSpan="3"/>
-        <Button x:Name="bUpdate"
-        HorizontalAlignment="Right"
-        VerticalAlignment="Center"
-        Content="Maj Trad"
-        Grid.Column="2" 
-        Grid.Row="4"
-        Click="bUpdate_Click"
-        Margin="0,0,140,0"
-        />
-        <Button x:Name="bExeSC"
-                HorizontalAlignment="Right"
+        <GroupBox Grid.Row="4" Grid.Column="0" Header="Options">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <CheckBox x:Name="CheckboxAutoLaunch" 
+              Content="Auto MAJ Trad + execution launcher" 
+              HorizontalAlignment="Left" 
+              Margin="0,3,0,0" 
+              VerticalAlignment="Top" 
+              Click="CheckboxAutoLaunch_Click"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="4" Grid.Column="1" Header="Utilitaire">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Button x:Name="bDeleteShader" Click="bDeleteShader_Click">Supprimer les shaders</Button>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="4" Grid.Column="3" Header="Traduction">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="bUpdate"
+                    Content="Appliquer la traduction"
+                    Click="bUpdate_Click"
+                            Width="135"
+                    Margin="0,0,0,0"/>
+
+                    <Button x:Name="bConfigTrad" 
+                    Width="20"
+                    Content="..."
+                    ToolTip="Configuration de la traduction"
+                    Click="bConfigTrad_Click"
+                    Margin="4,0,0,0"/>
+                </StackPanel>
+                <Button x:Name="bExeSC"
+                HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Content="Executer StarCitizen"
-                Grid.Column="2" 
-                Grid.Row="4"
+                Grid.Row="1"
                 Click="bExeSC_Click"
-                Margin="0,0,20,0"
+                Width="159"
                 Background="CornflowerBlue"
                 />
-        <Button x:Name="bConfigTrad" 
-                Grid.Column="2" 
-                Grid.Row="5" 
-                Margin="6,0,20,0" 
-                Content="Configuration de la traduction"
-                Click="bConfigTrad_Click"/>
+            </Grid>
+        </GroupBox>
         <WrapPanel x:Name="GameControlPanel" 
                    Orientation="Horizontal" 
                    Grid.Row="2" 
@@ -72,15 +103,6 @@
                    Grid.Column="0" 
                    Grid.ColumnSpan="3"
                    Background="LightGray"/>
-
-        <CheckBox x:Name="CheckboxAutoLaunch" 
-                  Content="Mise à jour et lancement automatique" 
-                  HorizontalAlignment="Left" 
-                  Margin="8,8,0,0" 
-                  Grid.Row="4" 
-                  VerticalAlignment="Top" 
-                  Grid.ColumnSpan="2"
-                  Click="CheckboxAutoLaunch_Click"/>
         <Label x:Name="labelAutoClose" 
                Visibility="Hidden"
                Content="xxx"
@@ -89,7 +111,7 @@
                Grid.Row="5" 
                VerticalAlignment="Center" 
                Grid.ColumnSpan="2"
-               Grid.RowSpan="2"/>
+               Grid.RowSpan="3"/>
     </Grid>
 
 </Window>
