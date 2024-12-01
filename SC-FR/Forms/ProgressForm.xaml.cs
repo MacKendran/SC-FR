@@ -79,7 +79,17 @@ namespace SCFR
 
             if (string.IsNullOrEmpty(p.param.Get(SCPathType.Games)))
             {
-                MessageBox.Show("Aucun chemin pour les répertoires d'instance de StarCitizen", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                var sb = new StringBuilder();
+                foreach (var instanceType in Enum.GetValues(typeof(GameType)))
+                { 
+                    if(sb.Length > 0)
+                        sb.Append(", ");
+
+                    sb.Append(instanceType.ToString());
+                }
+
+
+                MessageBox.Show($"Chemin pour les répertoires d'instance de StarCitizen invalide.\n\nVeuillez vérifier que le chemin 'Game Folder' contient un des répertoires suivant avec une installation valide du jeu : {sb.ToString()}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -92,7 +102,7 @@ namespace SCFR
 
             if (p.trad.getVersionFailed.HasValue && p.trad.getVersionFailed.Value == true)
             {
-                MessageBox.Show("Impossible d'obtenir les informations de version de la traduction", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Impossible d'obtenir les informations de version de la traduction.\n\nVeuillez réessayer", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
