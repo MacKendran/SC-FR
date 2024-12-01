@@ -117,8 +117,12 @@ namespace SC_FR_Library
                         StringBuilder sb = new StringBuilder();
                         sb.AppendLine(userCfgData.Substring(0, langIdx));
 
+                        sb.Append("g_language = ");
+
                         if (remove == false)
-                            sb.AppendLine("g_language = french_(france)\n");
+                            sb.AppendLine("french_(france)");
+                        else
+                            sb.AppendLine("english");
 
                         if (userCfgData.IndexOf("\n", langIdx) > -1)
                             sb.Append(userCfgData.Substring(userCfgData.IndexOf("\n", langIdx) + 1));
