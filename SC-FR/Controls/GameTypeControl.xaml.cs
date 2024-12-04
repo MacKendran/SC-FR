@@ -101,10 +101,11 @@ namespace SCFR.Controls
                         && (System.Windows.MessageBox.Show("Voulez-vous supprimer le fichier de traduction ?",$"Fichier de traduction {text}",MessageBoxButton.YesNo,MessageBoxImage.Question) == MessageBoxResult.Yes)) 
                     {   
                         File.Delete(file);
-                        p.trad.SetUserCfgLang(path, true);
-                        p.param.Set(ParamVersion.version,this.gameType,string.Empty);
                     }
+                    p.trad.SetUserCfgLang(path, true);
+                    p.param.Set(ParamVersion.version, this.gameType, string.Empty);         
                 }
+                SetCheck(this.checkbox.IsChecked ?? false, true);
             }
         }
 
