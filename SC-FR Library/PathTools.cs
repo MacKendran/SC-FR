@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,10 +18,17 @@ namespace SC_FR_Library
         public const string DIR_DATA = "data";
         public const string DIR_LOCALIZATION = "Localization";
 
+        public static string GetEnumDescription<T>(T enumValue)
+        {
+            var fieldInfo = enumValue.GetType().GetField(enumValue.ToString());
+            var descriptionAttributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            return descriptionAttributes.Length > 0 ? descriptionAttributes[0].Description : enumValue.ToString();
+        }
 
         public static string GetGamePathSection(GameType gameType)
         {
-            return GameTypePathSection[(int)gameType];
+            return GetEnumDescription(gameType);
+            //return GameTypePathSection[(int)gameType];
         }
 
         public static bool CheckGamePathRoot(string path)

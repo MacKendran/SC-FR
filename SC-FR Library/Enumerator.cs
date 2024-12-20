@@ -18,14 +18,21 @@ namespace SC_FR_Library
 
         public enum GameType
         {
+            [Description("LIVE")]
             Live = 0,
+            [Description("PTU")]
             PTU = 1,
+            [Description("EPTU")]
             EPTU = 2,
+            [Description("TECHPREVIEW")]
             TECHPREVIEW = 3,
-            HOTFIX = 4
+            [Description("HOTFIX")]
+            HOTFIX = 4,
+            [Description("4.0_PREVIEW")]
+            PREVIEW_4_0 = 5
         }       
 
-        public static string[] GameTypePathSection = new string[] { "Live", "PTU", "EPTU","TECH-PREVIEW","HOTFIX" };
+        public static string[] GameTypePathSection = new string[] { "Live", "PTU", "EPTU","TECH-PREVIEW","HOTFIX","4.0_PREVIEW" };
 
         public enum ApplyTradReturn
         {
