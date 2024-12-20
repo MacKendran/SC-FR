@@ -192,7 +192,8 @@ namespace SCFR
         {
             this.autoClose = false;
             labelAutoClose.Visibility = Visibility.Hidden;
-            this.timer.Stop();
+
+            this.timer?.Stop();
 
             SaveIni();
 
@@ -207,7 +208,7 @@ namespace SCFR
         {
             this.autoClose = false;
             labelAutoClose.Visibility = Visibility.Hidden;
-            this.timer.Stop();
+            this.timer?.Stop();
 
             app.Dispatcher.Invoke(() => { Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait; });
 
