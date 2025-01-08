@@ -24,7 +24,7 @@ namespace SCFR
         List<(GameTypeControl control, GameType type)> controlCheck;
 
         public bool autoClose = false;
-        public uint autoCloseTiming;
+        public uint autoCloseTiming = 30;
 
         System.Timers.Timer timer;
 
@@ -47,8 +47,11 @@ namespace SCFR
                 f.control.file = app.param.Get(f.type);
             }
 
-            CheckboxAutoLaunch.IsChecked = app.param.Get(IniOption.AutoMaj) == "1";
-            
+            autoClose = app.param.Get(IniOption.AutoClose) == "1";
+
+            CheckboxAutoTradMaj.IsChecked = app.param.Get(IniOption.AutoTradMaj) == "1";
+            CheckboxAutoLaunch.IsChecked  = app.param.Get(IniOption.AutoExecLauncher) == "1";
+            CheckboxAutoClose.IsChecked   = autoClose;
 
         }
 
@@ -181,10 +184,23 @@ namespace SCFR
             return;
         }
 
+        private void CheckboxAutoClose_Click(object sender, RoutedEventArgs e)
+        {
+            var s = sender as System.Windows.Controls.CheckBox;
+            app.param.Set(IniOption.AutoClose, s.IsChecked == true ? "1" : "0");
+            SaveIni();
+        }
+        private void CheckboxAutoTrad_Click(object sender, RoutedEventArgs e)
+        {
+            var s = sender as System.Windows.Controls.CheckBox;
+            app.param.Set(IniOption.AutoTradMaj, s.IsChecked == true ? "1" : "0");
+            SaveIni();
+        }
+
         private void CheckboxAutoLaunch_Click(object sender, RoutedEventArgs e)
         {
             var s = sender as System.Windows.Controls.CheckBox;
-            app.param.Set(IniOption.AutoMaj, s.IsChecked == true ? "1" : "0");
+            app.param.Set(IniOption.AutoExecLauncher, s.IsChecked == true ? "1" : "0");
             SaveIni();
         }
 

@@ -52,7 +52,9 @@ namespace SC_FR_Library
 
         public enum IniOption
         {
-            AutoMaj
+            AutoTradMaj,
+            AutoExecLauncher,
+            AutoClose
         }
 
         public enum ParamOption

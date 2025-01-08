@@ -51,13 +51,11 @@ namespace SCFR
             }
 
             ConfigForm configForm = new ConfigForm();
-            if (param.Get(IniOption.AutoMaj) == "1")
+            if (param.Get(IniOption.AutoTradMaj) == "1")
             {
                 var progress = new ProgressForm("MAJ Automatique de la traduction",true);
                 progress.ShowDialog();
                 this.LaunchStarCitizen();
-                configForm.autoClose = true;
-                configForm.autoCloseTiming = 30;
             }
             
             if(param.Get(ParamOption.Silent) != "1")
@@ -88,6 +86,16 @@ namespace SCFR
                 value = ini.Read(key, IniSection.Versions);
                 if(!string.IsNullOrEmpty(value))
                     param.Set(ParamVersion.version,g,value);
+            }
+
+            // convertion du param Général AutoMaj vers les nouveaux params
+            if (ini.Read("AutoMaj",IniSection.Options).Equals("1"))
+            {
+                foreach (IniOption o in Enum.GetValues(typeof(IniOption)))
+                {
+                    ini.Write(o.ToString(), "1", IniSection.Options);
+                }
+                ini.DeleteKey("AutoMaj", IniSection.Options);
             }
 
             foreach (IniOption o in Enum.GetValues(typeof(IniOption)))
@@ -170,7 +178,7 @@ namespace SCFR
                 }
             }
 
-            param.Set(IniOption.AutoMaj, "1");
+            param.Set(IniOption.AutoTradMaj, "1");
 
             if (string.IsNullOrEmpty(param.Get(SCPathType.Launcher)))
                 sbError.AppendLine($"- le chemin du Launcher n'est pas spécifié");

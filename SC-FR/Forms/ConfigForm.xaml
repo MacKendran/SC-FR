@@ -46,12 +46,29 @@
                     <RowDefinition Height="1*"/>
                     <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
-                <CheckBox x:Name="CheckboxAutoLaunch" 
-              Content="Auto MAJ Trad + execution launcher" 
-              HorizontalAlignment="Left" 
-              Margin="0,3,0,0" 
-              VerticalAlignment="Top" 
-              Click="CheckboxAutoLaunch_Click"/>
+            <CheckBox x:Name="CheckboxAutoTradMaj" 
+                Content="MAJ de la traduction au démarrage" 
+                ToolTip="Mettre à jour automatiquement la traduction au lancement de l'application"
+                HorizontalAlignment="Left" 
+                Margin="0,3,0,0" 
+                VerticalAlignment="Top" 
+                Click="CheckboxAutoTrad_Click"/>
+            <CheckBox x:Name="CheckboxAutoLaunch" 
+                Grid.Row="1"
+                Content="Exécuter le launcher RSI"
+                ToolTip="Exécuter le launcher RSI avec l'application"
+                HorizontalAlignment="Left" 
+                Margin="0,3,0,0" 
+                VerticalAlignment="Top" 
+                Click="CheckboxAutoLaunch_Click"/>
+            <CheckBox x:Name="CheckboxAutoClose" 
+                Grid.Row="2"
+                Content="Fermer l'application après 30 sec"
+                ToolTip="Fermer l'application automatiquement si aucune interaction n'a lieu après 30 secondes"
+                HorizontalAlignment="Left" 
+                Margin="0,3,0,0" 
+                VerticalAlignment="Top" 
+                Click="CheckboxAutoClose_Click"/>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="4" Grid.Column="1" Header="Utilitaire">
@@ -61,7 +78,17 @@
                     <RowDefinition Height="1*"/>
                     <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
-                <Button x:Name="bDeleteShader" Click="bDeleteShader_Click">Supprimer les shaders</Button>
+                <Button x:Name="bDeleteShader" Click="bDeleteShader_Click" Margin="0,2,0,0">Supprimer les shaders</Button>
+
+                <Button x:Name="bExeSC"
+                    
+                    Margin="0,2,0,0"
+                    Content="Exécuter StarCitizen"
+                    Grid.Row="1"
+                    Click="bExeSC_Click"
+                    FontWeight="Bold"
+                    Background="CornflowerBlue"
+                    />
             </Grid>
         </GroupBox>
         <GroupBox Grid.Row="4" Grid.Column="3" Header="Traduction">
@@ -71,29 +98,18 @@
                     <RowDefinition Height="1*"/>
                     <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button x:Name="bUpdate"
+                <Button x:Name="bUpdate"
                     Content="Appliquer la traduction"
+                    Margin="0,2,0,0"
                     Click="bUpdate_Click"
-                            Width="135"
-                    Margin="0,0,0,0"/>
-
-                    <Button x:Name="bConfigTrad" 
-                    Width="20"
-                    Content="..."
+                    />
+                <Button x:Name="bConfigTrad" 
+                    Grid.Row="1"
+                    Content="Options de la traduction"
                     ToolTip="Configuration de la traduction"
+                    Margin="0,2,0,0"
                     Click="bConfigTrad_Click"
-                    Margin="4,0,0,0"/>
-                </StackPanel>
-                <Button x:Name="bExeSC"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Content="Executer StarCitizen"
-                Grid.Row="1"
-                Click="bExeSC_Click"
-                Width="159"
-                Background="CornflowerBlue"
-                />
+                    />
             </Grid>
         </GroupBox>
         <WrapPanel x:Name="GameControlPanel" 
