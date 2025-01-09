@@ -32,16 +32,19 @@ namespace SCFR
         private const int GWL_STYLE = -16;
         private const int WS_SYSMENU = 0x80000;
 
+        App app = (App)System.Windows.Application.Current;
 
         BackgroundWorker worker = new BackgroundWorker();
         bool silentSuccess;
+        bool forceUpdate;
 
-        public ProgressForm(string initalText, bool silentSuccess):base()
+        public ProgressForm(string initalText, bool silentSuccess, bool forceUpdate = false):base()
         {
             InitializeComponent();
             this.textBlock.Text = initalText;
             this.progressBar.Maximum = 100;
             this.silentSuccess = silentSuccess;
+            this.forceUpdate = forceUpdate;
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -76,7 +79,17 @@ namespace SCFR
 
             if (string.IsNullOrEmpty(p.param.Get(SCPathType.Games)))
             {
-                MessageBox.Show("Aucun chemin pour les répertoires d'instance de StarCitizen", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                var sb = new StringBuilder();
+                foreach (var instanceType in Enum.GetValues(typeof(GameType)))
+                { 
+                    if(sb.Length > 0)
+                        sb.Append(", ");
+
+                    sb.Append(instanceType.ToString());
+                }
+
+
+                MessageBox.Show($"Chemin pour les répertoires d'instance de StarCitizen invalide.\n\nVeuillez vérifier que le chemin 'Game Folder' contient un des répertoires suivant avec une installation valide du jeu : {sb.ToString()}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -89,11 +102,35 @@ namespace SCFR
 
             if (p.trad.getVersionFailed.HasValue && p.trad.getVersionFailed.Value == true)
             {
-                MessageBox.Show("Impossible d'obtenir les informations de version de la traduction", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Impossible d'obtenir les informations de version de la traduction.\n\nVeuillez réessayer", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            if (!p.NeedToUpgrade())
+            Dictionary<TradElement, TradType> optionTrad = new Dictionary<TradElement, TradType>();
+
+            bool customTrad = false;
+
+            foreach (TradElement elem in Enum.GetValues(typeof(TradElement)))
+            {
+                string v = app.param.Get(elem);
+                if (v.Equals(TradType.SCFR.ToString()))
+                    optionTrad.Add(elem, TradType.SCFR);
+                else
+                {
+                    foreach (TradType type in Enum.GetValues(typeof(TradType)))
+                    {
+                        if (type.ToString().Equals(v) && type != TradType.SCFR)
+                        {
+                            customTrad = true;
+                            optionTrad.Remove(elem);
+                            optionTrad.Add(elem, type);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!p.NeedToUpgrade() && !forceUpdate)
             {
                 percent = 100;
                 w.ReportProgress(percent);
@@ -104,7 +141,20 @@ namespace SCFR
                 return;
             }
 
-            var downloadTrad = p.trad.DownloadTrad();
+            Task<bool> downloadTrad = null;
+
+            if (customTrad)
+            {
+                downloadTrad = p.trad.DownloadTradCustom(optionTrad[TradElement.UI],
+                                                         optionTrad[TradElement.UI_Ship],
+                                                         optionTrad[TradElement.Item],
+                                                         optionTrad[TradElement.Mission]);
+            }
+            else
+            {
+                downloadTrad = p.trad.DownloadTrad();
+            }
+
             while (!downloadTrad.IsCompleted)
             {
                 w.ReportProgress(percent);

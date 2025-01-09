@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using static SC_FR_Library.Enumerator;
 
@@ -24,6 +25,7 @@ namespace SC_FR_Library
         internal const string URL_BASE = "https://trad.sc.tasul.fr/";
 
         internal const string URL_TRAD = URL_BASE + "api/file/fr";
+        internal const string URL_TRAD_CUSTOM = URL_BASE + "api/file/custom?ui={0}&uiship={1}&item={2}&mission={3}";
         internal const string URL_VERSION = URL_BASE + "version/versions";
 
         internal byte[] tradFileBytes = new byte[0];
@@ -51,6 +53,25 @@ namespace SC_FR_Library
                 this.getVersionFailed = true;
             }
         }
+
+        public async Task<bool> DownloadTradCustom(TradType ui, TradType uiShip, TradType item, TradType mission)
+        {
+            this.tradFileBytes = new byte[0];
+            isDownloaded = false;
+
+            string url = string.Format(URL_TRAD_CUSTOM,(int)ui,(int)uiShip,(int)item,(int)mission);
+
+            var r = await Task.Run(() => new HttpClient().GetByteArrayAsync(url));
+            if (r != null)
+            {
+                this.tradFileBytes = r;
+                isDownloaded = true;
+                return (true);
+            }
+
+            return (false);
+        }
+
 
         public async Task<bool> DownloadTrad()
         {
@@ -91,20 +112,33 @@ namespace SC_FR_Library
                 int langIdx = userCfgData.IndexOf("g_language =");
                 if (langIdx > -1)
                 {
-                    if (!userCfgData.Substring(langIdx + "g_language".Length).Replace("=", "").TrimStart().StartsWith("french_(france)")
-                        || remove)
+                    int endOfKey = userCfgData.IndexOf("\r\n", langIdx);
+                    string keyVal = userCfgData.Substring(langIdx + "g_language".Length).Replace("=", "").Trim();
+
+                    if (keyVal.IndexOf("\r\n") > 1)
+                        keyVal = keyVal.Substring(0, keyVal.IndexOf("\r\n"));
+
+
+                    if (keyVal.Equals("french_(france)") && !remove)
+                        return;
+                    else if (keyVal.Equals("english") && remove)
+                        return;
+
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(userCfgData.Substring(0, langIdx));
+                    sb.AppendLine("g_language = " + (remove ? "english" : "french_(france)"));
+                    if (endOfKey > -1 && endOfKey != userCfgData.Length)
                     {
-                        StringBuilder sb = new StringBuilder();
-                        sb.AppendLine(userCfgData.Substring(0, langIdx));
-
-                        if (remove == false)
-                            sb.AppendLine("g_language = french_(france)\n");
-
-                        if (userCfgData.IndexOf("\n", langIdx) > -1)
-                            sb.Append(userCfgData.Substring(userCfgData.IndexOf("\n", langIdx) + 1));
-
-                        File.WriteAllText(userCfgFile, sb.ToString());
+                        if (userCfgData.Substring(endOfKey).StartsWith("\r\n"))
+                        {
+                            endOfKey += 2;    
+                        }
+                        if (endOfKey < userCfgData.Length)
+                            sb.Append(userCfgData.Substring(endOfKey));
                     }
+
+                    File.WriteAllText(userCfgFile, sb.ToString());
                 }
                 else if (remove == false)
                     File.AppendAllText(userCfgFile, $@"g_language = french_(france)");

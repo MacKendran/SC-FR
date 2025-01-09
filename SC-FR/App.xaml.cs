@@ -51,13 +51,11 @@ namespace SCFR
             }
 
             ConfigForm configForm = new ConfigForm();
-            if (param.Get(IniOption.AutoMaj) == "1")
+            if (param.Get(IniOption.AutoTradMaj) == "1")
             {
                 var progress = new ProgressForm("MAJ Automatique de la traduction",true);
                 progress.ShowDialog();
                 this.LaunchStarCitizen();
-                configForm.autoClose = true;
-                configForm.autoCloseTiming = 30;
             }
             
             if(param.Get(ParamOption.Silent) != "1")
@@ -90,11 +88,29 @@ namespace SCFR
                     param.Set(ParamVersion.version,g,value);
             }
 
+            // convertion du param Général AutoMaj vers les nouveaux params
+            if (ini.Read("AutoMaj",IniSection.Options).Equals("1"))
+            {
+                foreach (IniOption o in Enum.GetValues(typeof(IniOption)))
+                {
+                    ini.Write(o.ToString(), "1", IniSection.Options);
+                }
+                ini.DeleteKey("AutoMaj", IniSection.Options);
+            }
+
             foreach (IniOption o in Enum.GetValues(typeof(IniOption)))
             {
                 param.Set(o, ini.Read(o.ToString(), IniSection.Options));
             }
 
+            foreach (TradElement o in Enum.GetValues(typeof(TradElement)))
+            {
+                string v = ini.Read(o.ToString(), IniSection.Options);
+                if (string.IsNullOrEmpty(v))
+                    param.Set(o, TradType.SCFR.ToString());
+                else
+                    param.Set(o, v);
+            }
         }
         internal void LoadArgs(StartupEventArgs e)
         {
@@ -162,7 +178,7 @@ namespace SCFR
                 }
             }
 
-            param.Set(IniOption.AutoMaj, "1");
+            param.Set(IniOption.AutoTradMaj, "1");
 
             if (string.IsNullOrEmpty(param.Get(SCPathType.Launcher)))
                 sbError.AppendLine($"- le chemin du Launcher n'est pas spécifié");
@@ -193,7 +209,7 @@ namespace SCFR
                 if (activeKey == "1")
                 {
                     var fileTrad = Path.Combine(new string[] { param.Get(SCPathType.Games), PathTools.GetGamePathSection(gameType), PathTools.DIR_DATA, PathTools.DIR_LOCALIZATION, Trad.DIR_LANGUAGE, Trad.TRAD_FILE_NAME });
-                    if (!param.Get(ParamVersion.version, gameType).Equals(trad.version.update) || !File.Exists(fileTrad))
+                    if (!param.Get(ParamVersion.version, gameType)?.Equals(trad.version.update)??false || !File.Exists(fileTrad))
                         return true;
                 }
             }
@@ -205,11 +221,11 @@ namespace SCFR
             Process.Start(launcherPath);
         }
 
-        internal void UpdateTrad(bool silentSuccess)
+        internal void UpdateTrad(bool silentSuccess,bool forceUpdate = false)
         {
             trad.LoadVersion();
 
-            var progressForm = new ProgressForm("Mise à jour de la traduction",silentSuccess);
+            var progressForm = new ProgressForm("Mise à jour de la traduction",silentSuccess,forceUpdate);
             progressForm.Activate();
             progressForm.ShowDialog();
         }

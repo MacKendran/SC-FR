@@ -15,6 +15,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Path = System.IO.Path;
 using static SC_FR_Library.Enumerator;
+using System.Diagnostics;
+using MessageBox = System.Windows.MessageBox;
+using SC_FR_Library;
 
 namespace SCFR.Controls
 {
@@ -23,6 +26,8 @@ namespace SCFR.Controls
     /// </summary>
     public partial class GameTypeControl : System.Windows.Controls.UserControl
     {
+
+        App app = (App)System.Windows.Application.Current;
 
         internal const string TRAD_FILE_NAME = "global.ini";
         internal const string DIR_LANGUAGE = "french_(france)";
@@ -40,8 +45,8 @@ namespace SCFR.Controls
                     if (e.ToString().Equals(value))
                     {
                         gameType = e;
-                        label.Content = e.ToString();
-                        SetValue(TextProp, value);
+                        label.Content = PathTools.GetEnumDescription(e);
+                        SetValue(TextProp, label.Content);
                     }
                 }
             }
@@ -89,19 +94,39 @@ namespace SCFR.Controls
                 {
                     var p = (App)App.Current;
                     
-                    string path = Path.Combine(p.param.Get(SCPathType.Games),text);
+                    string path = Path.Combine(p.param.Get(SCPathType.Games), PathTools.GetGamePathSection(this.gameType));
                     string file = Path.Combine(path,DIR_DATA,DIR_LOCALIZATION,DIR_LANGUAGE,TRAD_FILE_NAME);
 
 
                     if (File.Exists(file) 
-                        && (System.Windows.MessageBox.Show("Voulez-vous supprimer le fichier de traduction ?",$"Fichier de traduction {text}",MessageBoxButton.YesNo,MessageBoxImage.Question) == MessageBoxResult.Yes)) 
+                        && (MessageBox.Show("Voulez-vous supprimer le fichier de traduction ?",$"Fichier de traduction {PathTools.GetGamePathSection(this.gameType)}",
+                            MessageBoxButton.YesNo,MessageBoxImage.Question) == MessageBoxResult.Yes)) 
                     {   
                         File.Delete(file);
-                        p.trad.SetUserCfgLang(path, true);
-                        p.param.Set(ParamVersion.version,this.gameType,string.Empty);
                     }
+                    p.trad.SetUserCfgLang(path, true);
+                    p.param.Set(ParamVersion.version, this.gameType, string.Empty);         
                 }
+                SetCheck(this.checkbox.IsChecked ?? false, true);
             }
+        }
+
+        private void mOpenScreenShot_Click(object sender, RoutedEventArgs e)
+        {
+            
+
+            string path = Path.Combine(app.param.Get(SCPathType.Games), PathTools.GetGamePathSection(this.gameType),"screenshots");
+
+            if (Directory.Exists(path))
+                Process.Start("explorer.exe",$"\"{path}\"");
+            else
+                MessageBox.Show($@"le répertoire {path} n'existe pas");
+        }
+
+        private void mTrad_Click(object sender, RoutedEventArgs e)
+        {
+            this.isChecked = !this.isChecked;
+            checkbox_Click(sender, e);
         }
     }
 }

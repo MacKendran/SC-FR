@@ -1,10 +1,15 @@
-﻿using SCFR.Controls;
+﻿using SC_FR.Forms;
+using SCFR.Controls;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Input;
 using System.Windows.Interop;
 using static SC_FR_Library.Enumerator;
+using MessageBox = System.Windows.MessageBox;
 
 namespace SCFR
 {
@@ -19,7 +24,7 @@ namespace SCFR
         List<(GameTypeControl control, GameType type)> controlCheck;
 
         public bool autoClose = false;
-        public uint autoCloseTiming;
+        public uint autoCloseTiming = 30;
 
         System.Timers.Timer timer;
 
@@ -42,8 +47,11 @@ namespace SCFR
                 f.control.file = app.param.Get(f.type);
             }
 
-            CheckboxAutoLaunch.IsChecked = app.param.Get(IniOption.AutoMaj) == "1";
-            
+            autoClose = app.param.Get(IniOption.AutoClose) == "1";
+
+            CheckboxAutoTradMaj.IsChecked = app.param.Get(IniOption.AutoTradMaj) == "1";
+            CheckboxAutoLaunch.IsChecked  = app.param.Get(IniOption.AutoExecLauncher) == "1";
+            CheckboxAutoClose.IsChecked   = autoClose;
 
         }
 
@@ -171,16 +179,87 @@ namespace SCFR
 
             var p = (App)System.Windows.Application.Current;
 
-            p.UpdateTrad(false);
+            p.UpdateTrad(false, true);
             
             return;
+        }
+
+        private void CheckboxAutoClose_Click(object sender, RoutedEventArgs e)
+        {
+            var s = sender as System.Windows.Controls.CheckBox;
+            app.param.Set(IniOption.AutoClose, s.IsChecked == true ? "1" : "0");
+            SaveIni();
+        }
+        private void CheckboxAutoTrad_Click(object sender, RoutedEventArgs e)
+        {
+            var s = sender as System.Windows.Controls.CheckBox;
+            app.param.Set(IniOption.AutoTradMaj, s.IsChecked == true ? "1" : "0");
+            SaveIni();
         }
 
         private void CheckboxAutoLaunch_Click(object sender, RoutedEventArgs e)
         {
             var s = sender as System.Windows.Controls.CheckBox;
-            app.param.Set(IniOption.AutoMaj, s.IsChecked == true ? "1" : "0");
+            app.param.Set(IniOption.AutoExecLauncher, s.IsChecked == true ? "1" : "0");
             SaveIni();
         }
+
+        private void bConfigTrad_Click(object sender, RoutedEventArgs e)
+        {
+            this.autoClose = false;
+            labelAutoClose.Visibility = Visibility.Hidden;
+
+            this.timer?.Stop();
+
+            SaveIni();
+
+            var form = new ConfigTradForm();
+            form.ShowDialog();
+            
+        }
+
+
+
+        private void bDeleteShader_Click(object sender, RoutedEventArgs e)
+        {
+            this.autoClose = false;
+            labelAutoClose.Visibility = Visibility.Hidden;
+            this.timer?.Stop();
+
+            app.Dispatcher.Invoke(() => { Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait; });
+
+            var scExe = Process.GetProcessesByName("starcitizen.exe");
+            if ( scExe.Count() > 0)
+            {
+                MessageBox.Show("une instance de Star Citizen est en cours d'execution veuillez quitter le jeu","Suppression des shaders",MessageBoxButton.OK,MessageBoxImage.Stop);
+                return;
+            }
+            
+            var shaderDir = Directory.GetDirectories(Path.GetDirectoryName(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Star Citizen\\")));
+            string[] dirToDelete = new string[] { "shaders", "VulkanShaderCache" };
+            try
+            {
+
+                foreach (var shaderPath in shaderDir)
+                {
+                    foreach (string dir in dirToDelete)
+                    {
+                        string path = Path.Combine(shaderPath, dir);
+                        if (Directory.Exists(path))
+                        {
+                            Directory.Delete(path, true);
+                        }
+                    }
+                }
+                MessageBox.Show("Suppression des shaders effectuée");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show($"une erreur est survenue, l'opération est avortée\n\nDescription de l'erreur : {ex.Message}", "Suppression des shaders", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            app.Dispatcher.Invoke(() => { Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow; });
+
+        }
+
     }
 }
